@@ -146,4 +146,17 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			saveStepExecution(stepExecution);
 		}
 	}
+
+	@Override
+	public int countStepExecutions(JobInstance jobInstance, String stepName) {
+		int count = 0;
+
+		for (StepExecution stepExecution : executionsByStepExecutionId.values()) {
+			if (stepExecution.getStepName().equals(stepName) && stepExecution.getJobExecution().getJobInstance()
+					.getInstanceId() == jobInstance.getInstanceId()) {
+				count++;
+			}
+		}
+		return count;
+	}
 }

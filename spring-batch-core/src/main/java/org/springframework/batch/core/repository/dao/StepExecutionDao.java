@@ -70,4 +70,13 @@ public interface StepExecutionDao {
 	 */
 	void addStepExecutions(JobExecution jobExecution);
 
+	/**
+	 * Counts all the {@link StepExecution} for a given step name.
+	 *
+	 * @param jobInstance the parent {@link JobInstance}
+	 * @param stepName the name of the step
+	 * @since 4.2.2
+	 * @return the count of {@link StepExecution}s for a given step
+	 */
+	int countStepExecutions(JobInstance jobInstance, String stepName);
 }

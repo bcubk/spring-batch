@@ -83,6 +83,14 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE STEP_EXECUTION_ID=?";
 
+	private static final String COUNT_STEP_EXECUTIONS = "SELECT COUNT(*) " +
+			" from %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE" +
+			" where " +
+			"      SE.JOB_EXECUTION_ID in (SELECT JOB_EXECUTION_ID from %PREFIX%JOB_EXECUTION " +
+			"where JE.JOB_INSTANCE_ID = ?)" +
+			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			"      and SE.STEP_NAME = ?";
+
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
@@ -298,6 +306,11 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	public void addStepExecutions(JobExecution jobExecution) {
 		getJdbcTemplate().query(getQuery(GET_STEP_EXECUTIONS), new StepExecutionRowMapper(jobExecution),
 				jobExecution.getId());
+	}
+
+	@Override
+	public int countStepExecutions(JobInstance jobInstance, String stepName) {
+		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), new Object[] { jobInstance.getInstanceId(), stepName }, Integer.class);
 	}
 
 	private static class StepExecutionRowMapper implements RowMapper<StepExecution> {
