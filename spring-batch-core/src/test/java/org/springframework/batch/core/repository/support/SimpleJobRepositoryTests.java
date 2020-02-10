@@ -16,10 +16,7 @@
 
 package org.springframework.batch.core.repository.support;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -92,7 +89,7 @@ public class SimpleJobRepositoryTests {
 
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 
-		jobParameters = new JobParametersBuilder().toJobParameters();
+		jobParameters = new JobParametersBuilder().addString("bar", "test").toJobParameters();
 
 		job = new JobSupport();
 		job.setBeanName("RepositoryTest");
@@ -232,4 +229,50 @@ public class SimpleJobRepositoryTests {
 		assertTrue(jobRepository.isJobInstanceExists("foo", new JobParameters()));
 	}
 
+	@Test(expected = JobExecutionAlreadyRunningException.class)
+	public void testCreateJobExecutionAlreadyRunning() throws Exception {
+		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExecution.setStartTime(new Date());
+		jobExecution.setEndTime(null);
+
+		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
+		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
+
+		jobRepository.createJobExecution("foo", new JobParameters());
+	}
+
+	@Test(expected = JobRestartException.class)
+	public void testCreateJobExecutionStatusUnknown() throws Exception {
+		jobExecution.setStatus(BatchStatus.UNKNOWN);
+		jobExecution.setEndTime(new Date());
+
+		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
+		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
+
+		jobRepository.createJobExecution("foo", new JobParameters());
+	}
+
+	@Test(expected = JobInstanceAlreadyCompleteException.class)
+	public void testCreateJobExecutionAlreadyComplete() throws Exception {
+		jobExecution.setStatus(BatchStatus.COMPLETED);
+		jobExecution.setEndTime(new Date());
+
+		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
+		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
+
+		jobRepository.createJobExecution("foo", new JobParameters());
+	}
+
+	@Test
+	public void testGetStepExecutionCount() {
+		// arrange
+		int expectedResult = 1;
+		when(stepExecutionDao.countStepExecutions(jobInstance, "stepName")).thenReturn(expectedResult);
+
+		// act
+		int actualResult = jobRepository.getStepExecutionCount(jobInstance, "stepName");
+
+		// assert
+		assertEquals(expectedResult, actualResult);
+	}
 }

@@ -254,17 +254,7 @@ public class SimpleJobRepository implements JobRepository {
 	 */
 	@Override
 	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
-		int count = 0;
-		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		for (JobExecution jobExecution : jobExecutions) {
-			stepExecutionDao.addStepExecutions(jobExecution);
-			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-				if (stepName.equals(stepExecution.getStepName())) {
-					count++;
-				}
-			}
-		}
-		return count;
+		return stepExecutionDao.countStepExecutions(jobInstance, stepName);
 	}
 
 	/**
