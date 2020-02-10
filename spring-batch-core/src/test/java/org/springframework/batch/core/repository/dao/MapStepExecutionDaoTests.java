@@ -117,4 +117,26 @@ public class MapStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		assertEquals(BatchStatus.COMPLETED, jobStepExecution.getStatus());
 	}
 
+	@Test
+	public void testCountStepExecutions() {
+		// arrange
+		StepExecutionDao tested = new MapStepExecutionDao();
+		JobExecution jobExecution = new JobExecution(jobInstance, 88L, null, null);
+
+		StepExecution firstStepExecution = new StepExecution("Step one", jobExecution);
+		firstStepExecution.setStatus(BatchStatus.STARTED);
+
+		tested.saveStepExecution(firstStepExecution);
+
+		StepExecution secondStepExecution = new StepExecution("Step two", jobExecution);
+		secondStepExecution.setStatus(BatchStatus.STARTED);
+
+		tested.saveStepExecution(secondStepExecution);
+
+		// act
+		int result = tested.countStepExecutions(jobInstance, firstStepExecution.getStepName());
+
+		//assert
+		assertEquals(1, result);
+	}
 }

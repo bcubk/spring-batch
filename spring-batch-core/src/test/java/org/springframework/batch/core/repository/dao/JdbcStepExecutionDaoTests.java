@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.dao;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -75,4 +76,16 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 				.length() < stepExecution.getExitStatus().getExitDescription().length());
 	}
 
+	@Transactional
+	@Test
+	public void testCountStepExecutions() {
+		// arrange
+		dao.saveStepExecution(stepExecution);
+
+		// act
+		int result = dao.countStepExecutions(jobInstance, stepExecution.getStepName());
+
+		// assert
+		assertEquals(1, result);
+	}
 }
