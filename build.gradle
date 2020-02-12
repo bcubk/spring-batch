@@ -17,10 +17,6 @@ buildscript {
 	}
 }
 
-plugins {
-	id 'org.sonarqube' version '2.1'
-}
-
 ext {
 	linkHomepage = 'http://projects.spring.io/spring-batch/'
 	linkCi       = 'https://build.spring.io/browse/BATCH'
@@ -648,21 +644,6 @@ asciidoctor {
 			'spring-version': project.version,
 			'allow-uri-read': ''
 
-}
-
-apply plugin: 'org.sonarqube'
-
-sonarqube {
-	properties {
-		property "sonar.projectName", "Spring Batch"
-		property "sonar.jacoco.reportPath", "${buildDir.name}/jacoco.exec"
-		property "sonar.links.homepage", linkHomepage
-		property "sonar.links.ci", linkCi
-		property "sonar.links.issue", linkIssue
-		property "sonar.links.scm", linkScmUrl
-		property "sonar.links.scm_dev", linkScmDevConnection
-		property "sonar.java.coveragePlugin", "jacoco"
-	}
 }
 
 task api(type: Javadoc) {

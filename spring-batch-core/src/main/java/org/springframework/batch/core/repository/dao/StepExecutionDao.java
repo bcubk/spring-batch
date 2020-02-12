@@ -19,6 +19,7 @@ package org.springframework.batch.core.repository.dao;
 import java.util.Collection;
 
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 
 public interface StepExecutionDao {
